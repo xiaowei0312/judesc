@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sxsram.ssm.mapper.MainMapper">
+	<select id="queryOnlineCommodityTypes" resultType="com.sxsram.ssm.entity.OnlineCommodityType">
+		select
+		id,typeName
+		from
+		t_online_commodity_type
+		where
+		parentId is null
+		order by
+		sequence
+	</select>
+
+	<resultMap type="com.sxsram.ssm.entity.NoticeType" id="map_noticeTypeAndNotice">
+		<id column="id" property="id" />
+		<result column="typeName" property="typeName" />
+		<collection property="notices" ofType="com.sxsram.ssm.entity.Notice">
+			<id column="noticeId" property="id" />
+			<result column="noticeTitle" property="noticeTitle" />
+			<result column="noticeFileName" property="noticeFileName" />
+			<result column="noticeAddTime" property="noticeAddTime" />
+		</collection>
+	</resultMap>
+	<select id="queryNoticeTypes" resultMap="map_noticeTypeAndNotice">
+		select
+		t.id,t.typeName,n.id as noticeId,n.noticeTitle,n.noticeFileName,n.noticeAddTime
+		from
+		t_sc_notice_type t left join t_sc_notice n
+		on n.noticeTypeId = t.id and n.noticeFlag = 0
+		order by
+		t.sequence
+	</select>
+
+	<resultMap type="com.sxsram.ssm.entity.OnlineCommodity" id="map_onlineCommodityAndModels">
+		<id column="id" property="id" />
+		<result column="commodityName" property="commodityName"/>
+		<result column="commodityMainPic" property="commodityMainPic"/>
+		<result column="commodityDetailFileName" property="commodityDetailFileName"/>
+		<collection property="commodityModels" ofType="com.sxsram.ssm.entity.OnlineCommodityModel">
+			<id column="mid" property="id"/>
+			<result column="commodityModel" property="commodityModel"/>
+			<result column="commodityPrice" property="commodityPrice"/>
+			<result column="commodityDesc" property="commodityDesc"/>
+			<result column="commodityService" property="commodityService"/>
+			<result column="commodityRepertory" property="commodityRepertory"/>
+			<result column="commodityFlag" property="commodityFlag"/>
+			<result column="commoditySalesVolume" property="commoditySalesVolume"/>
+			<result column="commodityPutawayTime" property="commodityPutawayTime"/>
+			<result column="commoditySoldoutTime" property="commoditySoldoutTime"/>
+			<result column="commoditySmallPic1" property="commoditySmallPic1"/>
+			<result column="commoditySmallPic2" property="commoditySmallPic2"/>
+			<result column="commoditySmallPic3" property="commoditySmallPic3"/>
+			<result column="commoditySmallPic4" property="commoditySmallPic4"/>
+			<result column="commoditySmallPic5" property="commoditySmallPic5"/>
+			<result column="isDefaultModel" property="isDefaultModel"/>
+		</collection>
+	</resultMap>
+	<select id="queryOnlineCommodities" parameterType="com.sxsram.ssm.entity.OnLineCommodityQueryVo"
+		resultMap="map_onlineCommodityAndModels">
+		select
+			c.id,c.commodityName,c.commodityMainPic,c.commodityDetailFileName,
+			m.id as mid,m.commodityModel,m.commodityPrice,m.commodityDesc,m.commodityService,
+			m.commodityRepertory,m.commodityFlag,m.commoditySalesVolume,m.commodityPutawayTime,m.commoditySoldoutTime,
+			m.commoditySmallPic1,m.commoditySmallPic2,m.commoditySmallPic3,m.commoditySmallPic4,m.commoditySmallPic5,
+			m.isDefaultModel
+		from
+			t_online_commodity c join t_online_commodity_model m 
+				on c.id = m.commodityId and m.commodityFlag = 0 and m.isDefaultModel = 1 and c.onlineCommodityFlag = 0
+		<if test="pagination != null">
+			<if test="pagination.orderByCols != null">
+				order by ${pagination.orderByCols}
+			</if>
+			<if test="pagination.limitStart != null">
+				limit #{pagination.limitStart},#{pagination.limitNum}
+			</if>
+		</if>
+	</select>
+
+	
+</mapper>
